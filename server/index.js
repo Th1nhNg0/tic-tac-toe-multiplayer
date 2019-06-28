@@ -4,9 +4,7 @@ var server = require("http").Server(app);
 var io = require("socket.io")(server);
 
 io.on("connection", function(socket) {
-  socket.on("send", function(data) {
-    io.emit("chat", data);
-  });
+  console.log("someone connect");
 });
 
 app.get("/", function(req, res) {
