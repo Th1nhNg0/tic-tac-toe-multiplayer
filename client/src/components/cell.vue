@@ -1,6 +1,6 @@
 <template>
   <div class="cell" v-on:click="check">
-    <img :src="img">
+    <img :src="img" />
   </div>
 </template>
 
@@ -8,17 +8,11 @@
 <script>
 export default {
   name: "Cell",
-  props: ["img"],
-  data() {
-    return {
-      canClick: true
-    };
-  },
+  props: ["img", "canClick"],
   methods: {
     check: function() {
       if (this.canClick) {
         this.$emit("change");
-        this.canClick = false;
       }
     }
   }
