@@ -3,10 +3,10 @@ var app = express();
 var server = require("http").Server(app);
 var io = require("socket.io")(server);
 var uuidv1 = require("uuid/v1");
-
-app.use(express.static(__dirname + "/public"));
-app.get(/.*/, (req, res) => res.sendFile(__dirname + "/public/index.html"));
-
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(__dirname + "/public"));
+  app.get(/.*/, (req, res) => res.sendFile(__dirname + "/public/index.html"));
+}
 var Game = require("./game");
 var games = {};
 
@@ -57,4 +57,4 @@ function onDisconnect() {
     delete this.roomName;
   }
 }
-server.listen(3000, () => console.log("server start"));
+server.listen(process.env.PORT || 5000, () => console.log("server start"));
