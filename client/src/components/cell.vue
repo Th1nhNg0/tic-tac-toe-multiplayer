@@ -29,8 +29,8 @@ img {
 }
 
 .cell {
-  width: 33.33%;
-  height: 33.33%;
+  width: 33.333333333333336%;
+  height: 33.333333333333336%;
 
   display: flex;
   justify-content: center;
@@ -42,8 +42,6 @@ img {
   border-color: black;
 
   user-select: none;
-
-  transition: 0.1s ease-in-out;
 }
 .cell:hover {
   background: rgba(0, 0, 0, 0.1);

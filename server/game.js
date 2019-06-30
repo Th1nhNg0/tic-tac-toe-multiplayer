@@ -10,12 +10,14 @@ class Game {
     this.currentTurn = null;
     this.cells = [];
     this.size = size;
+    this.isStart = false;
     this.canPlay = false;
     this.canJoin = true;
     this.winner = { img: "" };
     for (var i = 0; i < size * size; i++) {
       this.cells.push({ id: i, img: defaultCellImg, canClick: true, mark: "" });
     }
+    // setInterval(this.update,1000/60)  this may lag
   }
 
   addPlayer(socket, username, img) {
@@ -23,23 +25,26 @@ class Game {
     this.sockets[socket.id] = socket;
     this.players[socket.id] = new Player(socket.id, username, img);
     if (this.currentTurn == null) this.currentTurn = socket.id;
-    socket.emit("update", this.createUpdate());
+    this.update();
   }
 
   removePlayer(socket) {
-    this.nextPlayer(socket.id);
+    if (socket.id == this.currentTurn) this.nextPlayer(socket.id);
     delete this.sockets[socket.id];
     delete this.players[socket.id];
+    this.update();
   }
 
   start() {
+    this.isStart = true;
     this.canPlay = true;
     this.canJoin = false;
+    this.update();
   }
 
   move(socketID, cellID) {
     if (!this.canPlay) return;
-    if (this.players[socketID].id != this.currentTurn) return;
+    if (socketID != this.currentTurn) return;
 
     this.cells[cellID].img = this.players[socketID].img;
     this.cells[cellID].canClick = false;
@@ -50,6 +55,13 @@ class Game {
       this.winner = this.players[socketID];
     }
     this.update();
+  }
+
+  update() {
+    Object.keys(this.sockets).forEach(playerID => {
+      const socket = this.sockets[playerID];
+      socket.emit("update", this.createUpdate());
+    });
   }
 
   checkWin(id) {
@@ -100,13 +112,6 @@ class Game {
     return false;
   }
 
-  update() {
-    Object.keys(this.sockets).forEach(playerID => {
-      const socket = this.sockets[playerID];
-      socket.emit("update", this.createUpdate());
-    });
-  }
-
   nextPlayer(socketID) {
     var playersID = [];
     for (var k in this.sockets) playersID.push(k);
@@ -119,9 +124,17 @@ class Game {
     return {
       cells: this.cells,
       currentTurn: this.currentTurn,
-      winner: this.winner
+      winner: this.winner,
+      players: ObjToArr(this.players),
+      isStart: this.isStart,
+      roomID: this.name
     };
   }
 }
 
+function ObjToArr(arr) {
+  return Object.keys(arr).map(function(key) {
+    return arr[key];
+  });
+}
 module.exports = Game;

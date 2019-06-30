@@ -2,19 +2,19 @@ var express = require("express");
 var app = express();
 var server = require("http").Server(app);
 var io = require("socket.io")(server);
+var uuidv1 = require("uuid/v1");
 
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(__dirname + "/public"));
-  app.get(/.*/, (req, res) => res.sendFile(__dirname + "/public/index.html"));
-}
+app.use(express.static(__dirname + "/public"));
+app.get(/.*/, (req, res) => res.sendFile(__dirname + "/public/index.html"));
 
-const Game = require("./game");
-const games = {};
+var Game = require("./game");
+var games = {};
 
 io.on("connection", function(socket) {
   socket.on("join", joinGame);
-  socket.on("move", handleMove);
+  socket.on("leaveGame", leaveGame);
   socket.on("startGame", onStart);
+  socket.on("move", handleMove);
   socket.on("disconnect", onDisconnect);
 });
 
@@ -27,10 +27,17 @@ function joinGame({ username, img }) {
     }
   }
   if (!this.roomName) {
-    var roomID = "ROOM_" + username;
+    var roomID = uuidv1().substring(0, 7);
     games[roomID] = new Game(roomID, 3);
     this.roomName = roomID;
     games[roomID].addPlayer(this, username, img);
+  }
+}
+
+function leaveGame() {
+  if (this.roomName) {
+    games[this.roomName].removePlayer(this);
+    delete this.roomName;
   }
 }
 
@@ -45,6 +52,9 @@ function onStart() {
 function onDisconnect() {
   if (this.roomName) {
     games[this.roomName].removePlayer(this);
+    var players = games[this.roomName].players;
+    if (Object.keys(players).length == 0) delete games[this.roomName];
+    delete this.roomName;
   }
 }
 server.listen(80, () => console.log("server start"));
