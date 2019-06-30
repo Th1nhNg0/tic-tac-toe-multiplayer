@@ -57,4 +57,4 @@ function onDisconnect() {
     delete this.roomName;
   }
 }
-server.listen(80, () => console.log("server start"));
+server.listen(3000, () => console.log("server start"));
