@@ -26,8 +26,7 @@ export default {
     };
   },
   created() {
-    var port = process.env.PORT || 5000;
-    this.socket = io(window.location.hostname + ":" + port);
+    this.socket = io();
   },
   components: {
     board
