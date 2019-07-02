@@ -1,8 +1,9 @@
 class Player {
-  constructor(id, username, img) {
+  constructor(id, username, img, isBot) {
     this.username = username;
     this.id = id;
     this.img = img;
+    this.isBot = isBot;
   }
 }
 

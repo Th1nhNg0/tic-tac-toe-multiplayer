@@ -21,12 +21,13 @@ export default {
   data() {
     return {
       nameScene: true,
-      username: "Your Name",
+      username: null,
       socket: {}
     };
   },
   created() {
-    this.socket = io();
+    this.socket = io(); //production
+    // this.socket = io("localhost:5000");//develop
   },
   components: {
     board
@@ -34,7 +35,7 @@ export default {
   methods: {
     joinRoom: function() {
       this.socket.emit("join", {
-        username: this.username,
+        username: this.username || "anonymous",
         img: "https://api.adorable.io/avatars/" + this.username
       });
       this.nameScene = false;

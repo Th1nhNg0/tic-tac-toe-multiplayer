@@ -1,5 +1,6 @@
 <template>
-  <div class="cell" v-on:click="check">
+  <div class="cell" v-on:click="check" v-bind:style="{  width: sizeCalc,
+  height: sizeCalc}">
     <img :src="img" />
   </div>
 </template>
@@ -8,12 +9,17 @@
 <script>
 export default {
   name: "Cell",
-  props: ["img", "canClick"],
+  props: ["img", "canClick", "size"],
   methods: {
     check: function() {
       if (this.canClick) {
         this.$emit("change");
       }
+    }
+  },
+  computed: {
+    sizeCalc: function() {
+      return 100 / this.size + "%";
     }
   }
 };
@@ -29,8 +35,8 @@ img {
 }
 
 .cell {
-  width: 33.333333333333336%;
-  height: 33.333333333333336%;
+  width: calc(100% / 3);
+  height: calc(100% / 3);
 
   display: flex;
   justify-content: center;

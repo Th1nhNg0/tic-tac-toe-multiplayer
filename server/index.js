@@ -14,10 +14,14 @@ io.on("connection", function(socket) {
   socket.on("join", joinGame);
   socket.on("leaveGame", leaveGame);
   socket.on("startGame", onStart);
+  socket.on("addBot", addBot);
   socket.on("move", handleMove);
   socket.on("disconnect", onDisconnect);
 });
 
+function addBot() {
+  games[this.roomName].addBot();
+}
 function joinGame({ username, img }) {
   for (index in games) {
     var game = games[index];
@@ -28,7 +32,7 @@ function joinGame({ username, img }) {
   }
   if (!this.roomName) {
     var roomID = uuidv1().substring(0, 7);
-    games[roomID] = new Game(roomID, 3);
+    games[roomID] = new Game(roomID);
     this.roomName = roomID;
     games[roomID].addPlayer(this, username, img);
   }

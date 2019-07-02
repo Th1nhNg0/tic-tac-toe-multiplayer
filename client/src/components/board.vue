@@ -8,6 +8,12 @@
         :player="player"
         :currentTurn="currentTurn"
       />
+      <player
+        v-show="!isStart"
+        :player="{username:'addbot',img:'http://www.no42architects.com.au/wp-content/uploads/2018/05/plus-math.png',id:'addBot'}"
+        :currentTurn="currentTurn"
+        @click.native="addBot"
+      />
     </div>
     <div id="board" v-show="isStart">
       <div v-show="winnerImg!=''" class="overlay">
@@ -20,6 +26,7 @@
         :img="cell.img"
         v-on:change="move(cell.id)"
         :canClick="cell.canClick"
+        :size="size"
       />
     </div>
 
@@ -42,7 +49,8 @@ export default {
       cells: [],
       currentTurn: "",
       isStart: false,
-      winnerImg: null
+      winnerImg: null,
+      size: null
     };
   },
 
@@ -54,6 +62,7 @@ export default {
       this.winnerImg = data.winner.img;
       this.players = data.players;
       this.isStart = data.isStart;
+      this.size = data.size;
     });
   },
 
@@ -68,6 +77,9 @@ export default {
     playAgain: function() {
       this.socket.emit("leaveGame");
       this.$emit("playAgain");
+    },
+    addBot: function() {
+      this.socket.emit("addBot");
     }
   },
 

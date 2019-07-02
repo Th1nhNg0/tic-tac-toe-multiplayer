@@ -13,7 +13,7 @@ export default {
   computed: {
     getcolor: function() {
       if (this.player.id == this.currentTurn) return "#2A8048";
-      else return "#DB5272";
+      else return "black";
     }
   }
 };
@@ -27,7 +27,7 @@ export default {
 }
 p {
   display: table;
-  margin: 0;
+  margin: auto;
   color: white;
   font: 20px Helvetica;
   letter-spacing: 3px;
@@ -37,6 +37,9 @@ img {
   height: 70%;
   border-radius: 50%;
   border: 7px solid;
-  transition: 0.2s ease-in;
+  transition: 0.1s ease-in;
+}
+img:hover {
+  transform: scale(1.1);
 }
 </style>
