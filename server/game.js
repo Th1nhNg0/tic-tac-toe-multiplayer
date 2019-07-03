@@ -1,5 +1,5 @@
 const Player = require("./player");
-const Board = require("./Board");
+const Board = require("./board");
 var uuidv1 = require("uuid/v1");
 
 class Game {
