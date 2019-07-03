@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container" @mouseover="mouseOver" @mouseleave="mouseLeave" @click="mouseClick">
     <img :src="player.img" v-bind:style="{ 'border-color':getcolor}" />
     <p>{{player.username}}</p>
   </div>
@@ -9,11 +9,22 @@
 <script>
 export default {
   name: "Player",
-  props: ["player", "currentTurn"],
+  props: ["player", "currentTurn", "socket"],
   computed: {
     getcolor: function() {
       if (this.player.id == this.currentTurn) return "#2A8048";
       else return "black";
+    }
+  },
+  methods: {
+    mouseClick: function() {
+      if (this.player.isBot) this.socket.emit("removeBot", this.player.id);
+    },
+    mouseOver: function() {
+      this.$bus.emit("playerHover", this.player.img);
+    },
+    mouseLeave: function() {
+      this.$bus.emit("playerHoverLeave");
     }
   }
 };
@@ -40,6 +51,6 @@ img {
   transition: 0.1s ease-in;
 }
 img:hover {
-  transform: scale(1.1);
+  transform: scale(1.2);
 }
 </style>

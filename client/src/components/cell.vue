@@ -1,7 +1,7 @@
 <template>
-  <div class="cell" v-on:click="check" v-bind:style="{  width: sizeCalc,
+  <div class="cell" v-on:click="check" :style="{  width: sizeCalc,
   height: sizeCalc}">
-    <img :src="img" />
+    <img :src="img" :style="{width:imgSize, height:imgSize,opacity:imgOpacity}" />
   </div>
 </template>
 
@@ -10,6 +10,27 @@
 export default {
   name: "Cell",
   props: ["img", "canClick", "size"],
+  data() {
+    return {
+      imgSize: 80 + "%",
+      imgOpacity: 1
+    };
+  },
+  created() {
+    this.$bus.on("playerHover", id => {
+      if (id == this.img) {
+        this.imgSize = 90 + "%";
+        this.imgOpacity = 1;
+      } else {
+        this.imgSize = 70 + "%";
+        this.imgOpacity = 0.5;
+      }
+    });
+    this.$bus.on("playerHoverLeave", () => {
+      this.imgOpacity = 1;
+      this.imgSize = 80 + "%";
+    });
+  },
   methods: {
     check: function() {
       if (this.canClick) {
@@ -29,9 +50,8 @@ export default {
 <style scoped>
 img {
   object-fit: cover;
-  width: 80%;
-  height: 80%;
   border-radius: 50%;
+  transition: 0.1s ease-in;
 }
 
 .cell {

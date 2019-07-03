@@ -7,6 +7,7 @@
         :key="player.id"
         :player="player"
         :currentTurn="currentTurn"
+        :socket="socket"
       />
       <player
         v-show="!isStart"
@@ -75,8 +76,7 @@ export default {
       this.socket.emit("startGame");
     },
     playAgain: function() {
-      this.socket.emit("leaveGame");
-      this.$emit("playAgain");
+      this.socket.emit("playAgain");
     },
     addBot: function() {
       this.socket.emit("addBot");
@@ -130,6 +130,7 @@ img {
 }
 
 #board {
+  background: rgba(0, 0, 0, 0.1);
   margin: auto;
   width: 350px;
   height: 350px;

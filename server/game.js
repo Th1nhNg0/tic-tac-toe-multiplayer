@@ -1,6 +1,5 @@
-const defaultCellImg =
-  "data:image/gif;base64,R0lGODlhAQABAPAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==";
 const Player = require("./player");
+const Board = require("./Board");
 var uuidv1 = require("uuid/v1");
 
 class Game {
@@ -9,8 +8,7 @@ class Game {
     this.sockets = {};
     this.players = {};
     this.currentTurn = null;
-    this.cells = [];
-    this.size = 3;
+    this.board = {};
     this.isStart = false;
     this.canPlay = false;
     this.canJoin = true;
@@ -28,6 +26,13 @@ class Game {
       true
     );
     this.update();
+  }
+
+  removeBot(botID) {
+    if (this.players[botID].isBot && !this.isStart) {
+      delete this.players[botID];
+      this.update();
+    }
   }
 
   addPlayer(socket, username, img) {
@@ -49,12 +54,20 @@ class Game {
     this.isStart = true;
     this.canPlay = true;
     this.canJoin = false;
+    this.board = new Board(Object.keys(this.players).length + 1);
+    this.update();
+  }
 
-    this.size = Object.keys(this.players).length + 1;
-    for (var i = 0; i < this.size * this.size; i++) {
-      this.cells.push({ id: i, img: defaultCellImg, canClick: true, mark: "" });
+  reset() {
+    while (this.players[this.currentTurn].isBot) {
+      this.nextPlayer(this.currentTurn);
+      console.log(this.currentTurn);
     }
-
+    this.board = new Board(Object.keys(this.players).length + 1);
+    this.isStart = false;
+    this.canPlay = false;
+    this.canJoin = true;
+    this.winner = { img: "" };
     this.update();
   }
 
@@ -62,48 +75,43 @@ class Game {
     if (!this.canPlay) return;
     if (socketID != this.currentTurn) return;
 
-    this.cells[cellID].img = this.players[socketID].img;
-    this.cells[cellID].canClick = false;
-    this.cells[cellID].mark = socketID;
-    this.nextPlayer(socketID);
-    if (this.checkWin(socketID)) {
+    this.board.move(this.players[socketID], cellID);
+    if (this.board.win(socketID)) {
       this.canPlay = false;
       this.winner = this.players[socketID];
     }
+    this.nextPlayer(socketID);
     this.update();
 
     //check for bot
     if (this.players[this.currentTurn].isBot && this.canPlay) {
-      setTimeout(this.botMove.bind(this), 1000);
+      setTimeout(this.botMove.bind(this), 500);
     }
   }
 
   botMove() {
     var bot = this.players[this.currentTurn];
-    var i = Math.floor(Math.random() * this.cells.length);
-    while (this.cells[i].mark != "")
-      i = Math.floor(Math.random() * this.cells.length);
-    this.cells[i].img = bot.img;
-    this.cells[i].canClick = false;
-    this.cells[i].mark = bot.id;
+    var i = Math.floor(Math.random() * this.board.cells.length);
+    while (this.board.cells[i].mark != "")
+      i = Math.floor(Math.random() * this.board.cells.length);
+    if (this.board.size == 3)
+      i = bot.minimax(this.board, bot.id, 9, this.players).move;
+    this.board.move(bot, i);
     this.nextPlayer(bot.id);
-    if (this.checkWin(bot.id)) {
+    if (this.board.win(bot.id)) {
       this.canPlay = false;
       this.winner = bot;
     }
 
     this.update();
     if (this.players[this.currentTurn].isBot && this.canPlay) {
-      setTimeout(this.botMove.bind(this), 1000);
+      setTimeout(this.botMove.bind(this), 500);
     }
   }
 
   update() {
     if (this.isStart) {
-      var tie = true;
-      for (var i = 0; i < this.size * this.size; i++) {
-        if (this.cells[i].mark == "") tie = false;
-      }
+      var tie = this.board.tie();
       if (tie && !this.winner.id) {
         this.canPlay = false;
         this.winner = {
@@ -118,54 +126,6 @@ class Game {
     });
   }
 
-  checkWin(id) {
-    var cells2D = [];
-    var cells = [...this.cells];
-    while (cells.length) cells2D.push(cells.splice(0, this.size));
-    //horizontal
-    for (var i = 0; i < this.size; i++)
-      for (var j = 1; j < this.size - 1; j++)
-        if (
-          cells2D[i][j].mark == cells2D[i][j - 1].mark &&
-          cells2D[i][j].mark == cells2D[i][j + 1].mark &&
-          cells2D[i][j].mark == id
-        )
-          return true;
-
-    // vertical
-    for (var j = 0; j < this.size; j++)
-      for (var i = 1; i < this.size - 1; i++)
-        if (
-          cells2D[i][j].mark == cells2D[i - 1][j].mark &&
-          cells2D[i][j].mark == cells2D[i + 1][j].mark &&
-          cells2D[i][j].mark == id
-        )
-          return true;
-
-    //diagonal
-    for (var i = 0; i < this.size - 2; i++)
-      for (var j = 0; j < this.size - 2; j++)
-        if (
-          cells2D[i][j].mark == cells2D[i + 1][j + 1].mark &&
-          cells2D[i][j].mark == cells2D[i + 2][j + 2].mark &&
-          cells2D[i][j].mark == id
-        )
-          return true;
-
-    //other diagonal
-    for (var i = 0; i < this.size - 2; i++)
-      for (var j = 2; j < this.size; j++)
-        if (
-          cells2D[i][j].mark == cells2D[i + 1][j - 1].mark &&
-          cells2D[i][j].mark == cells2D[i + 2][j - 2].mark &&
-          cells2D[i][j].mark == id
-        )
-          return true;
-
-    // otherwise
-    return false;
-  }
-
   nextPlayer(socketID) {
     var playersID = [];
     for (var k in this.players) playersID.push(k);
@@ -176,13 +136,13 @@ class Game {
 
   createUpdate() {
     return {
-      cells: this.cells,
+      cells: this.board.cells,
       currentTurn: this.currentTurn,
       winner: this.winner,
       players: ObjToArr(this.players),
       isStart: this.isStart,
       roomID: this.name,
-      size: this.size
+      size: this.board.size
     };
   }
 }

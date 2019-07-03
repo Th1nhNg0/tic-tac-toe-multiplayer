@@ -14,7 +14,9 @@ io.on("connection", function(socket) {
   socket.on("join", joinGame);
   socket.on("leaveGame", leaveGame);
   socket.on("startGame", onStart);
+  socket.on("playAgain", playAgain);
   socket.on("addBot", addBot);
+  socket.on("removeBot", removeBot);
   socket.on("move", handleMove);
   socket.on("disconnect", onDisconnect);
 });
@@ -22,6 +24,15 @@ io.on("connection", function(socket) {
 function addBot() {
   games[this.roomName].addBot();
 }
+
+function removeBot(botID) {
+  games[this.roomName].removeBot(botID);
+}
+
+function playAgain() {
+  games[this.roomName].reset();
+}
+
 function joinGame({ username, img }) {
   for (index in games) {
     var game = games[index];

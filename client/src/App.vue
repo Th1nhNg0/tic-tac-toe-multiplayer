@@ -8,7 +8,7 @@
       </label>
       <input v-on:click="joinRoom" type="submit" value="Enter" />
     </div>
-    <board v-show="!nameScene" :socket="socket" v-on:playAgain="joinRoom" />
+    <board v-show="!nameScene" :socket="socket" />
   </div>
 </template>
 
@@ -27,7 +27,7 @@ export default {
   },
   created() {
     this.socket = io(); //production
-    // this.socket = io("localhost:5000");//develop
+    // this.socket = io("localhost:5000"); //develop
   },
   components: {
     board
