@@ -4,14 +4,15 @@ class Player {
     this.id = id;
     this.img = img;
     this.isBot = isBot;
+    if (isBot) this.smart = Math.floor(Math.random() * 10);
   }
-  minimax(board, currentTurn, depth, players) {
+  minimax(board, currentTurn, depth, alpha, beta, players) {
     var lastTurn = previousPlayer(players, currentTurn);
     var nextTurn = nextPlayer(players, currentTurn);
     //check win
     if (board.win(lastTurn)) {
-      if (lastTurn == this.id) return { value: 20 };
-      return { value: -20 };
+      if (lastTurn == this.id) return { value: 20 + depth };
+      return { value: -20 + depth };
     }
     if (!board.canPlay()) return { value: 0 }; //tie
     if (depth == 0) return { value: 0 }; //out of think
@@ -24,17 +25,20 @@ class Player {
       if (board.cells[i].mark != "") continue;
       board.move(players[currentTurn], i);
 
-      var temp = this.minimax(board, nextTurn, depth - 1, players);
+      var temp = this.minimax(board, nextTurn, depth - 1, alpha, beta, players);
       if (currentTurn == this.id) {
         if (temp.value > result.value) result = { value: temp.value, move: i };
         if (temp.value == result.value && Math.random() > 0.5)
           result = { value: temp.value, move: i };
+        alpha = Math.max(alpha, result.value);
       } else {
         if (temp.value < result.value) result = { value: temp.value, move: i };
         if (temp.value == result.value && Math.random() > 0.5)
           result = { value: temp.value, move: i };
+        beta = Math.min(beta, result.value);
       }
       board.unMove(i);
+      if (alpha >= beta) return result;
     }
     return result;
   }

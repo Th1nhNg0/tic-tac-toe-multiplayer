@@ -61,7 +61,6 @@ class Game {
   reset() {
     while (this.players[this.currentTurn].isBot) {
       this.nextPlayer(this.currentTurn);
-      console.log(this.currentTurn);
     }
     this.board = new Board(Object.keys(this.players).length + 1);
     this.isStart = false;
@@ -95,7 +94,8 @@ class Game {
     while (this.board.cells[i].mark != "")
       i = Math.floor(Math.random() * this.board.cells.length);
     if (this.board.size == 3)
-      i = bot.minimax(this.board, bot.id, 9, this.players).move;
+      i = bot.minimax(this.board, bot.id, bot.smart, -1e8, 1e8, this.players)
+        .move;
     this.board.move(bot, i);
     this.nextPlayer(bot.id);
     if (this.board.win(bot.id)) {
@@ -107,6 +107,14 @@ class Game {
     if (this.players[this.currentTurn].isBot && this.canPlay) {
       setTimeout(this.botMove.bind(this), 500);
     }
+  }
+
+  nextPlayer(socketID) {
+    var playersID = [];
+    for (var k in this.players) playersID.push(k);
+    var i = playersID.indexOf(socketID);
+    if (i + 1 >= playersID.length) this.currentTurn = playersID[0];
+    else this.currentTurn = playersID[i + 1];
   }
 
   update() {
@@ -124,14 +132,6 @@ class Game {
       const socket = this.sockets[playerID];
       socket.emit("update", this.createUpdate());
     });
-  }
-
-  nextPlayer(socketID) {
-    var playersID = [];
-    for (var k in this.players) playersID.push(k);
-    var i = playersID.indexOf(socketID);
-    if (i + 1 >= playersID.length) this.currentTurn = playersID[0];
-    else this.currentTurn = playersID[i + 1];
   }
 
   createUpdate() {
