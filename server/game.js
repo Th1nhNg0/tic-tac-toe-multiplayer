@@ -29,7 +29,7 @@ class Game {
   }
 
   removeBot(botID) {
-    if (this.players[botID].isBot && !this.isStart) {
+    if (!this.isStart && this.players[botID] && this.players[botID].isBot) {
       delete this.players[botID];
       this.update();
     }

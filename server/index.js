@@ -53,6 +53,8 @@ function leaveGame() {
   if (this.roomName) {
     games[this.roomName].removePlayer(this);
     delete this.roomName;
+    var players = games[this.roomName].sockets;
+    if (Object.keys(players).length == 0) delete games[this.roomName];
   }
 }
 
@@ -67,7 +69,7 @@ function onStart() {
 function onDisconnect() {
   if (this.roomName) {
     games[this.roomName].removePlayer(this);
-    var players = games[this.roomName].players;
+    var players = games[this.roomName].sockets;
     if (Object.keys(players).length == 0) delete games[this.roomName];
     delete this.roomName;
   }
