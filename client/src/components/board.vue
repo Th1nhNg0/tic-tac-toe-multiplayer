@@ -1,6 +1,7 @@
 <template>
   <div>
     <h1>Room Name: {{roomID}}</h1>
+
     <div class="playersList">
       <player
         v-for="player in players"
@@ -9,17 +10,11 @@
         :currentTurn="currentTurn"
         :socket="socket"
       />
-      <player
-        v-show="!isStart"
-        :player="{username:'addbot',img:'http://www.no42architects.com.au/wp-content/uploads/2018/05/plus-math.png',id:'addBot'}"
-        :currentTurn="currentTurn"
-        @click.native="addBot"
-      />
     </div>
+
     <div id="board" v-show="isStart">
       <div v-show="winnerImg!=''" class="overlay">
         <img :src="winnerImg" />
-        <p class="myButton" v-on:click="playAgain">CLICK HERE TO PLAY AGAIN</p>
       </div>
       <cell
         v-for="cell in cells"
@@ -31,6 +26,8 @@
       />
     </div>
 
+    <p v-show="!isStart||winnerImg!=''" v-on:click="$bus.emit('back')" class="myButton">BACK</p>
+    <p v-show="winnerImg!=''" class="myButton" v-on:click="playAgain">PLAY AGAIN</p>
     <p v-show="!isStart" v-on:click="startGame" class="myButton">Start</p>
   </div>
 </template>
@@ -77,9 +74,6 @@ export default {
     },
     playAgain: function() {
       this.socket.emit("playAgain");
-    },
-    addBot: function() {
-      this.socket.emit("addBot");
     }
   },
 
@@ -103,6 +97,7 @@ export default {
   font-size: 19px;
   font-weight: bold;
   padding: 24px 40px;
+  margin: 10px;
   text-decoration: none;
 }
 .myButton:hover {

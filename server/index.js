@@ -10,40 +10,34 @@ if (process.env.NODE_ENV === "production") {
 var Game = require("./game");
 var games = {};
 
-io.on("connection", function(socket) {
+io.on("connection", function (socket) {
   socket.on("join", joinGame);
   socket.on("leaveGame", leaveGame);
   socket.on("startGame", onStart);
   socket.on("playAgain", playAgain);
-  socket.on("addBot", addBot);
-  socket.on("removeBot", removeBot);
   socket.on("move", handleMove);
-  socket.on("disconnect", onDisconnect);
+  socket.on("disconnect", leaveGame);
 });
-
-function addBot() {
-  games[this.roomName].addBot();
-}
-
-function removeBot(botID) {
-  games[this.roomName].removeBot(botID);
-}
 
 function playAgain() {
   games[this.roomName].reset();
 }
 
-function joinGame({ username, img }) {
+function joinGame({
+  username,
+  img,
+  maxPlayers
+}) {
   for (index in games) {
     var game = games[index];
-    if (game.canJoin) {
+    if (game.canJoin && game.maxPlayers == maxPlayers && Object.keys(game.players).length < maxPlayers) {
       this.roomName = game.name;
       game.addPlayer(this, username, img);
     }
   }
   if (!this.roomName) {
     var roomID = uuidv1().substring(0, 7);
-    games[roomID] = new Game(roomID);
+    games[roomID] = new Game(roomID, maxPlayers);
     this.roomName = roomID;
     games[roomID].addPlayer(this, username, img);
   }
@@ -52,9 +46,9 @@ function joinGame({ username, img }) {
 function leaveGame() {
   if (this.roomName) {
     games[this.roomName].removePlayer(this);
-    delete this.roomName;
     var players = games[this.roomName].sockets;
     if (Object.keys(players).length == 0) delete games[this.roomName];
+    delete this.roomName;
   }
 }
 
@@ -66,12 +60,4 @@ function onStart() {
   games[this.roomName].start();
 }
 
-function onDisconnect() {
-  if (this.roomName) {
-    games[this.roomName].removePlayer(this);
-    var players = games[this.roomName].sockets;
-    if (Object.keys(players).length == 0) delete games[this.roomName];
-    delete this.roomName;
-  }
-}
 server.listen(process.env.PORT || 5000, () => console.log("server start"));

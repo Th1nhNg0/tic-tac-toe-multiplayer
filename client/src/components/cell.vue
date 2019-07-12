@@ -1,7 +1,7 @@
 <template>
   <div class="cell" v-on:click="check" :style="{  width: sizeCalc,
   height: sizeCalc}">
-    <img :src="img" :style="{width:imgSize, height:imgSize,opacity:imgOpacity}" />
+    <img v-if="img!=''" :src="img" :style="{width:imgSize, height:imgSize,opacity:imgOpacity}" />
   </div>
 </template>
 

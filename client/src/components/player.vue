@@ -1,5 +1,5 @@
 <template>
-  <div class="container" @mouseover="mouseOver" @mouseleave="mouseLeave" @click="mouseClick">
+  <div class="container" @mouseover="mouseOver" @mouseleave="mouseLeave" >
     <img :src="player.img" v-bind:style="{ 'border-color':getcolor}" />
     <p>{{player.username}}</p>
   </div>
@@ -17,9 +17,6 @@ export default {
     }
   },
   methods: {
-    mouseClick: function() {
-      if (this.player.isBot) this.socket.emit("removeBot", this.player.id);
-    },
     mouseOver: function() {
       this.$bus.emit("playerHover", this.player.img);
     },

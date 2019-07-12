@@ -1,31 +1,21 @@
-const defaultCellImg =
-  "data:image/gif;base64,R0lGODlhAQABAPAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==";
 class Board {
   constructor(size) {
     this.cells = [];
     this.size = size;
     for (var i = 0; i < this.size * this.size; i++) {
-      this.cells.push({ id: i, img: defaultCellImg, canClick: true, mark: "" });
+      this.cells.push({
+        id: i,
+        img: "",
+        canClick: true,
+        mark: ""
+      });
     }
-  }
-
-  canPlay() {
-    for (var i = 0; i < this.size * this.size; i++) {
-      if (this.cells[i].mark == "") return true;
-    }
-    return false;
   }
 
   move(player, cellID) {
     this.cells[cellID].img = player.img;
     this.cells[cellID].canClick = false;
     this.cells[cellID].mark = player.id;
-  }
-
-  unMove(cellID) {
-    this.cells[cellID].img = defaultCellImg;
-    this.cells[cellID].canClick = true;
-    this.cells[cellID].mark = "";
   }
 
   tie() {

@@ -1,14 +1,17 @@
 <template>
   <div id="app">
-    <div class="form" v-show="nameScene">
-      <h1>Nhập tên của bạn</h1>
-      <label>
-        <input id="fname" v-model="username" type="text" />
-        <span>Name</span>
-      </label>
-      <input v-on:click="joinRoom" type="submit" value="Enter" />
-    </div>
-    <board v-show="!nameScene" :socket="socket" />
+    <transition mode="out-in" name="fade">
+      <form class="form" v-if="nameScene" v-on:submit.prevent="joinRoom">
+        <h1>TICTACMUL</h1>
+        <input v-model="username" type="text" placeholder="YourName" />
+        <select v-model="maxPlayers">
+          <option v-for="i in 6" :key="i" :value="i">{{i}} players</option>
+        </select>
+        <button class="btn" type="submit">Play</button>
+      </form>
+
+      <board v-else :socket="socket" />
+    </transition>
   </div>
 </template>
 
@@ -22,12 +25,17 @@ export default {
     return {
       nameScene: true,
       username: null,
-      socket: {}
+      socket: {},
+      maxPlayers: 2
     };
   },
   created() {
     this.socket = io(); //production
     // this.socket = io("localhost:5000"); //develop
+    this.$bus.on("back", () => {
+      this.socket.emit("leaveGame");
+      this.nameScene = true;
+    });
   },
   components: {
     board
@@ -36,7 +44,8 @@ export default {
     joinRoom: function() {
       this.socket.emit("join", {
         username: this.username || "anonymous",
-        img: "https://api.adorable.io/avatars/" + this.username
+        img: "https://api.adorable.io/avatars/" + this.username,
+        maxPlayers: this.maxPlayers
       });
       this.nameScene = false;
     }
@@ -45,111 +54,96 @@ export default {
 </script>
 
 <style>
-#app {
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  color: #f7fff7;
   font-family: "Avenir", Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
 }
-.form {
-  display: table;
-  margin: 40px auto;
-}
-h1 {
-  display: table;
-  margin: 40px auto;
-  color: #fff;
-  font: 20px Helvetica;
-  text-transform: uppercase;
-  letter-spacing: 3px;
-}
-
 body {
-  background: #35dc9b;
-}
-label {
-  position: relative;
-  display: block;
-}
-label input::-webkit-input-placeholder {
-  transition: all 0.2s ease-in-out;
-  color: #999;
-  font: 18px Helvetica, Arial, sans-serif;
-}
-label input:-ms-input-placeholder {
-  transition: all 0.2s ease-in-out;
-  color: #999;
-  font: 18px Helvetica, Arial, sans-serif;
-}
-label input::-ms-input-placeholder {
-  transition: all 0.2s ease-in-out;
-  color: #999;
-  font: 18px Helvetica, Arial, sans-serif;
-}
-label input::placeholder {
-  transition: all 0.2s ease-in-out;
-  color: #999;
-  font: 18px Helvetica, Arial, sans-serif;
-}
-label input:focus,
-label input.populated {
-  padding-top: 28px;
-  padding-bottom: 12px;
-}
-label input:focus::-webkit-input-placeholder,
-label input.populated::-webkit-input-placeholder {
-  color: transparent;
-}
-label input:focus:-ms-input-placeholder,
-label input.populated:-ms-input-placeholder {
-  color: transparent;
-}
-label input:focus::-ms-input-placeholder,
-label input.populated::-ms-input-placeholder {
-  color: transparent;
-}
-label input:focus::placeholder,
-label input.populated::placeholder {
-  color: transparent;
-}
-label input:focus + span,
-label input.populated + span {
-  opacity: 1;
-  top: 10px;
-}
-label span {
-  color: #35dc9b;
-  font: 13px Helvetica, Arial, sans-serif;
-  position: absolute;
-  top: 0px;
-  left: 20px;
-  opacity: 0;
-  transition: all 0.2s ease-in-out;
-}
-input[type="submit"] {
-  transition: all 0.2s ease-in-out;
-  font: 18px Helvetica, Arial, sans-serif;
-  border: none;
-  background: #1aaf75;
-  color: #fff;
-  padding: 16px 40px;
-}
-input[type="submit"]:hover {
-  background: #109f67;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  max-height: 100%;
+  float: left;
+  width: 100%;
+  overflow: hidden;
+  background: #1a535c;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-label input {
-  font: 18px Helvetica, Arial, sans-serif;
-  box-sizing: border-box;
-  display: block;
+.fade-enter-active,
+.fade-leave-to {
+  transition: opacity 0.25s;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
+p {
+  margin: 0;
+  margin-top: 20px;
+}
+form {
+  width: 500px;
+}
+input[type="text"],
+select {
+  text-align: center;
+  width: 51%;
+  height: 60px;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border-radius: 10px;
   border: none;
-  padding: 20px;
-  width: 300px;
-  margin-bottom: 20px;
-  font-size: 18px;
+  box-sizing: border-box;
+  transition: 0.3s ease-in-out;
+  box-shadow: 0 3px 4px #ffe66d;
+
+  font-weight: bold;
+  font-size: large;
+}
+select {
+  text-align-last: center;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+option {
+  padding: 12px 20px;
+}
+input:focus {
+  width: 70%;
   outline: none;
-  transition: all 0.2s ease-in-out;
+}
+select:focus {
+  outline: none;
+  border-radius: 10px 10px 0 0;
+}
+.btn {
+  width: 50%;
+  height: 60px;
+  background-color: #4ecdc4;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 3px 4px #ffe66d;
+  font-weight: bold;
+  font-size: large;
+  transition: 0.1s ease-in-out;
+}
+.btn:hover {
+  transform: scale(1.1);
+  background-color: #66a7a4;
 }
 </style>
