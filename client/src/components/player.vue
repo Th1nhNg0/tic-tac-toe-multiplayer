@@ -1,6 +1,12 @@
 <template>
-  <div class="container" @mouseover="mouseOver" @mouseleave="mouseLeave" >
-    <img :src="player.img" v-bind:style="{ 'border-color':getcolor}" />
+  <div class="container" @mouseover="mouseOver" @mouseleave="mouseLeave">
+    <img
+      @load="imgLoaded=true"
+      v-show="imgLoaded"
+      :src="player.img"
+      v-bind:style="{ 'border-color':getcolor}"
+    />
+    <img v-show="!imgLoaded" src="loading.svg" style="border-color:red" />
     <p>{{player.username}}</p>
   </div>
 </template>
@@ -10,10 +16,15 @@
 export default {
   name: "Player",
   props: ["player", "currentTurn", "socket"],
+  data() {
+    return {
+      imgLoaded: false
+    };
+  },
   computed: {
     getcolor: function() {
-      if (this.player.id == this.currentTurn) return "#2A8048";
-      else return "black";
+      if (this.player.id == this.currentTurn) return "#4ECDC4";
+      else return "#2B706B";
     }
   },
   methods: {

@@ -25,10 +25,8 @@
         :size="size"
       />
     </div>
-
-    <p v-show="!isStart||winnerImg!=''" v-on:click="$bus.emit('back')" class="myButton">BACK</p>
-    <p v-show="winnerImg!=''" class="myButton" v-on:click="playAgain">PLAY AGAIN</p>
-    <p v-show="!isStart" v-on:click="startGame" class="myButton">Start</p>
+    <button v-show="!isStart||winnerImg!=''" v-on:click="$bus.emit('back')" class="btn bbtn">BACK</button>
+    <button v-show="winnerImg!=''" class="btn bbtn" v-on:click="playAgain">PLAY AGAIN</button>
   </div>
 </template>
 
@@ -68,10 +66,6 @@ export default {
     move: function(id) {
       this.socket.emit("move", id);
     },
-    startGame: function() {
-      this.isStart = true;
-      this.socket.emit("startGame");
-    },
     playAgain: function() {
       this.socket.emit("playAgain");
     }
@@ -85,23 +79,10 @@ export default {
 </script>
 
 <style scoped>
-.myButton {
-  background-color: #109f67;
-  -moz-border-radius: 32px;
-  -webkit-border-radius: 32px;
-  border-radius: 32px;
-  display: inline-block;
-  cursor: pointer;
-  color: #ffffff;
-  font-family: Arial;
-  font-size: 19px;
-  font-weight: bold;
-  padding: 24px 40px;
-  margin: 10px;
-  text-decoration: none;
-}
-.myButton:hover {
-  transform: scale(1.06);
+.bbtn {
+  width: 40%;
+  margin: 0px 10px;
+  padding: 0;
 }
 .playersList {
   display: flex;

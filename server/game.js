@@ -16,7 +16,7 @@ class Game {
     this.winner = {
       img: ""
     };
-    setInterval(this.update.bind(this), 1000 / 30);
+    setInterval(this.update.bind(this), 1000 / 15);
   }
 
   addBot() {

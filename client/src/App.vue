@@ -1,7 +1,14 @@
 <template>
   <div id="app">
+    <transition name="modal" appear>
+      <div class="errorMsg" v-if="isModal">
+        <span class="xbtn" @click="closeModal()">&times;</span>
+        <h1>Thông báo</h1>
+      </div>
+    </transition>
+
     <transition mode="out-in" name="fade">
-      <form class="form" v-if="nameScene" v-on:submit.prevent="joinRoom">
+      <form class="form" v-if="nameScene" v-on:submit.prevent="joinRoom" :style="getStyle">
         <h1>TICTACMUL</h1>
         <input v-model="username" type="text" placeholder="YourName" />
         <select v-model="maxPlayers">
@@ -26,7 +33,9 @@ export default {
       nameScene: true,
       username: null,
       socket: {},
-      maxPlayers: 2
+      maxPlayers: 2,
+      isModal: false,
+      modalContent: []
     };
   },
   created() {
@@ -41,19 +50,66 @@ export default {
     board
   },
   methods: {
+    closeModal: function() {
+      this.isModal = false;
+      this.modalContent = [];
+    },
     joinRoom: function() {
-      this.socket.emit("join", {
-        username: this.username || "anonymous",
+      this.socket.emit("joinGame", {
+        username: this.username || "MeowMeow",
         img: "https://api.adorable.io/avatars/" + this.username,
         maxPlayers: this.maxPlayers
       });
       this.nameScene = false;
+    }
+  },
+  computed: {
+    getStyle: function() {
+      if (this.isModal)
+        return { filter: "blur(5px)", "pointer-events": "none" };
+      return {};
     }
   }
 };
 </script>
 
 <style>
+.modal-enter-active,
+.modal-leave-active {
+  transition: all 0.5s ease-in-out;
+}
+.modal-enter, .modal-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+  transform: scale(0);
+}
+.xbtn {
+  position: absolute;
+  border: none;
+  margin: 0;
+  font-size: 80px;
+  font-weight: bold;
+  top: -12px;
+  color: #ff6b6b;
+  right: 10px;
+  transition: 0.1s ease-in;
+}
+.xbtn:hover {
+  transform: scale(1.2);
+}
+.errorMsg {
+  position: fixed;
+  color: black;
+  right: 0;
+  left: 0;
+  margin-right: auto;
+  margin-left: auto;
+  min-height: 10em;
+  width: 350px;
+  height: 250px;
+  background: #ffe66d;
+  box-shadow: 0 3px 4px rgba(0, 0, 0, 0.8);
+  z-index: 1;
+}
 html {
   margin: 0;
   padding: 0;
@@ -104,11 +160,12 @@ select {
   border-radius: 10px;
   border: none;
   box-sizing: border-box;
-  transition: 0.3s ease-in-out;
-  box-shadow: 0 3px 4px #ffe66d;
+  box-shadow: 0 3px 4px rgba(0, 0, 0, 0.8);
 
   font-weight: bold;
   font-size: large;
+
+  transition: 0.3s ease-in-out;
 }
 select {
   text-align-last: center;
@@ -133,11 +190,11 @@ select:focus {
   height: 60px;
   background-color: #4ecdc4;
   padding: 14px 20px;
-  margin: 8px 0;
+  margin: 20px 0px;
   border: none;
   border-radius: 10px;
   cursor: pointer;
-  box-shadow: 0 3px 4px #ffe66d;
+  box-shadow: 0 3px 4px rgba(0, 0, 0, 0.8);
   font-weight: bold;
   font-size: large;
   transition: 0.1s ease-in-out;

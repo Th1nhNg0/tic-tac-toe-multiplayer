@@ -11,9 +11,8 @@ var Game = require("./game");
 var games = {};
 
 io.on("connection", function (socket) {
-  socket.on("join", joinGame);
+  socket.on("joinGame", joinGame);
   socket.on("leaveGame", leaveGame);
-  socket.on("startGame", onStart);
   socket.on("playAgain", playAgain);
   socket.on("move", handleMove);
   socket.on("disconnect", leaveGame);
