@@ -13,7 +13,6 @@ var playersCount = 0;
 io.on("connection", function (socket) {
   playersCount++;
   io.emit('totalPlayers', playersCount);
-
   socket.on("joinGame", joinGame);
   socket.on("leaveGame", leaveGame);
   socket.on("playAgain", playAgain);

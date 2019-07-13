@@ -1,9 +1,10 @@
 <template>
   <div id="app">
     <transition name="modal" appear>
-      <div class="errorMsg" v-if="isModal">
+      <div class="errorMsg" v-if="modalMess.length>0">
         <span class="xbtn" @click="closeModal()">&times;</span>
         <h1>Thông báo</h1>
+        <p v-for="(mess,index) in modalMess" :key="index">{{mess}}</p>
       </div>
     </transition>
 
@@ -36,16 +37,20 @@ export default {
       username: null,
       socket: {},
       maxPlayers: 2,
-      isModal: false,
-      modalContent: [],
+      modalMess: [],
       totalPlayers: 0
     };
   },
   created() {
-    // this.socket = io(); //production
-    this.socket = io("localhost:5000"); //develop
+    this.socket = io(); //production
+    // this.socket = io("localhost:5000"); //develop
 
+    //totalplayer online
     this.socket.on("totalPlayers", data => (this.totalPlayers = data));
+
+    //is server send message
+    this.socket.on("message", data => this.modalMess.push(data));
+    //go back
     this.$bus.on("back", () => {
       this.socket.emit("leaveGame");
       this.nameScene = true;
@@ -56,10 +61,13 @@ export default {
   },
   methods: {
     closeModal: function() {
-      this.isModal = false;
-      this.modalContent = [];
+      this.modalMess = [];
     },
     joinRoom: function() {
+      if (this.username.length > 9) {
+        this.modalMess.push("Xin lỗi, tên bạn quá dài");
+        return;
+      }
       this.socket.emit("joinGame", {
         username: this.username || "MeowMeow",
         img: "https://api.adorable.io/avatars/" + this.username,
@@ -70,7 +78,7 @@ export default {
   },
   computed: {
     getStyle: function() {
-      if (this.isModal)
+      if (this.modalMess.length > 0)
         return { filter: "blur(5px)", "pointer-events": "none" };
       return {};
     }
