@@ -6,7 +6,7 @@
       :src="player.img"
       v-bind:style="{ 'border-color':getcolor}"
     />
-    <img v-show="!imgLoaded" src="loading.svg" style="border-color:red" />
+    <img v-if="!imgLoaded" src="loading.svg" style="border-color:red" />
     <p>{{player.username}}</p>
   </div>
 </template>
@@ -29,7 +29,7 @@ export default {
   },
   methods: {
     mouseOver: function() {
-      this.$bus.emit("playerHover", this.player.img);
+      this.$bus.emit("playerHover", this.player.id);
     },
     mouseLeave: function() {
       this.$bus.emit("playerHoverLeave");

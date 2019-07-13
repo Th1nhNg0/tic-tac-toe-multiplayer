@@ -35,7 +35,7 @@ class Game {
     this.sockets[socket.id] = socket;
     this.players[socket.id] = new Player(socket.id, username, img, false);
     if (this.currentTurn == null) this.currentTurn = socket.id;
-    if (Object.keys(this.players).length == this.maxPlayers) this.start();
+    if (Object.keys(this.players).length == this.maxPlayers) this.preStart();
   }
 
   removePlayer(socket) {
@@ -47,8 +47,23 @@ class Game {
   start() {
     this.isStart = true;
     this.canPlay = true;
-    this.canJoin = false;
     this.board = new Board(this.maxPlayers + 1);
+  }
+
+  preStart() {
+    this.canJoin = false;
+    var time = 5;
+    this.interval = setInterval(() => {
+      Object.keys(this.sockets).forEach(playerID => {
+        const socket = this.sockets[playerID];
+        socket.emit("waiting", time);
+      });
+      time--;
+      if (time == -1) {
+        clearInterval(this.interval);
+        this.start();
+      }
+    }, 1000);
   }
 
   reset() {
@@ -59,6 +74,7 @@ class Game {
     this.winner = {
       img: ""
     };
+    if (Object.keys(this.players).length == this.maxPlayers) this.preStart();
   }
 
   move(socketID, cellID) {

@@ -9,13 +9,20 @@ if (process.env.NODE_ENV === "production") {
 }
 var Game = require("./game");
 var games = {};
-
+var playersCount = 0;
 io.on("connection", function (socket) {
+  playersCount++;
+  io.emit('totalPlayers', playersCount);
+
   socket.on("joinGame", joinGame);
   socket.on("leaveGame", leaveGame);
   socket.on("playAgain", playAgain);
   socket.on("move", handleMove);
   socket.on("disconnect", leaveGame);
+  socket.on("disconnect", () => {
+    playersCount--;
+    io.emit('totalPlayers', playersCount);
+  });
 });
 
 function playAgain() {

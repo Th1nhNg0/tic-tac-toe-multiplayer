@@ -19,6 +19,8 @@
 
       <board v-else :socket="socket" />
     </transition>
+
+    <p id="totalPlayers">Online: {{totalPlayers}} players</p>
   </div>
 </template>
 
@@ -35,12 +37,15 @@ export default {
       socket: {},
       maxPlayers: 2,
       isModal: false,
-      modalContent: []
+      modalContent: [],
+      totalPlayers: 0
     };
   },
   created() {
-    this.socket = io(); //production
-    // this.socket = io("localhost:5000"); //develop
+    // this.socket = io(); //production
+    this.socket = io("localhost:5000"); //develop
+
+    this.socket.on("totalPlayers", data => (this.totalPlayers = data));
     this.$bus.on("back", () => {
       this.socket.emit("leaveGame");
       this.nameScene = true;
@@ -114,6 +119,7 @@ html {
   margin: 0;
   padding: 0;
   height: 100%;
+  width: 100%;
   color: #f7fff7;
   font-family: "Avenir", Helvetica, Arial, sans-serif;
   text-align: center;
@@ -121,8 +127,7 @@ html {
 body {
   margin: 0;
   padding: 0;
-  height: 100%;
-  max-height: 100%;
+  min-height: 100%;
   float: left;
   width: 100%;
   overflow: hidden;
@@ -149,6 +154,12 @@ p {
 form {
   width: 500px;
 }
+@media only screen and (max-width: 600px) {
+  form {
+    width: 350px;
+  }
+}
+
 input[type="text"],
 select {
   text-align: center;
@@ -202,5 +213,12 @@ select:focus {
 .btn:hover {
   transform: scale(1.1);
   background-color: #66a7a4;
+}
+#totalPlayers {
+  right: 20px;
+  bottom: 20px;
+  position: fixed;
+  font-weight: bold;
+  font-size: larger;
 }
 </style>

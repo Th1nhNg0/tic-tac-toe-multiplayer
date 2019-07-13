@@ -1,7 +1,9 @@
 <template>
   <div class="cell" v-on:click="check" :style="{  width: sizeCalc,
   height: sizeCalc}">
-    <img v-if="img!=''" :src="img" :style="{width:imgSize, height:imgSize,opacity:imgOpacity}" />
+    <transition name="playerImg">
+      <img v-if="img!=''" :src="img" :style="{width:imgSize, height:imgSize,opacity:imgOpacity}" />
+    </transition>
   </div>
 </template>
 
@@ -9,7 +11,7 @@
 <script>
 export default {
   name: "Cell",
-  props: ["img", "canClick", "size"],
+  props: ["img", "canClick", "size", "id"],
   data() {
     return {
       imgSize: 80 + "%",
@@ -18,7 +20,7 @@ export default {
   },
   created() {
     this.$bus.on("playerHover", id => {
-      if (id == this.img) {
+      if (id == this.id) {
         this.imgSize = 90 + "%";
         this.imgOpacity = 1;
       } else {
@@ -48,6 +50,13 @@ export default {
 
 
 <style scoped>
+.playerImg-enter-active {
+  transition: all 0.2s;
+}
+.playerImg-enter {
+  opacity: 0;
+  transform: scale(0);
+}
 img {
   object-fit: cover;
   border-radius: 50%;
@@ -70,6 +79,6 @@ img {
   user-select: none;
 }
 .cell:hover {
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.2);
 }
 </style>
