@@ -51,6 +51,7 @@ class Game {
   }
 
   preStart() {
+    if (this.interval) return;
     this.canJoin = false;
     var time = 5;
     this.interval = setInterval(() => {
@@ -61,6 +62,7 @@ class Game {
       time--;
       if (time == -1) {
         clearInterval(this.interval);
+        this.interval = null;
         this.start();
       }
     }, 1000);

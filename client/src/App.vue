@@ -64,7 +64,7 @@ export default {
       this.modalMess = [];
     },
     joinRoom: function() {
-      if (this.username.length > 9) {
+      if (this.username && this.username.length > 9) {
         this.modalMess.push("Xin lỗi, tên bạn quá dài");
         return;
       }
