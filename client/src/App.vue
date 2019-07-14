@@ -13,7 +13,7 @@
         <h1>TICTACMUL</h1>
         <input v-model="username" type="text" placeholder="YourName" />
         <select v-model="maxPlayers">
-          <option v-for="i in 6" :key="i" :value="i">{{i}} players</option>
+          <option v-for="i in 4" :key="i" :value="i">{{i}} players</option>
         </select>
         <button class="btn" type="submit">Play</button>
       </form>

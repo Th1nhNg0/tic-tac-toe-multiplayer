@@ -48,7 +48,7 @@ p {
   display: table;
   margin: auto;
   color: white;
-  font: 20px Helvetica;
+  font: 10px Helvetica;
   letter-spacing: 3px;
 }
 img {
