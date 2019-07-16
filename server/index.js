@@ -17,12 +17,17 @@ io.on("connection", function (socket) {
   socket.on("leaveGame", leaveGame);
   socket.on("playAgain", playAgain);
   socket.on("move", handleMove);
+  socket.on("chat", handleChat);
   socket.on("disconnect", leaveGame);
   socket.on("disconnect", () => {
     playersCount--;
     io.emit('totalPlayers', playersCount);
   });
 });
+
+function handleChat(msg) {
+  games[this.roomName].chat(this.id, msg);
+}
 
 function playAgain() {
   games[this.roomName].reset();

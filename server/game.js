@@ -19,6 +19,14 @@ class Game {
     setInterval(this.update.bind(this), 1000 / 15);
   }
 
+
+  chat(id, msg) {
+    Object.keys(this.sockets).forEach(playerID => {
+      const socket = this.sockets[playerID];
+      socket.emit("chat", id, msg);
+    });
+  }
+
   addBot() {
     if (!this.canJoin) return;
     var botID = uuidv1().substring(0, 4);

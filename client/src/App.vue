@@ -168,8 +168,8 @@ form {
   }
 }
 
-input[type="text"],
-select {
+.form input[type="text"],
+.form select {
   text-align: center;
   width: 51%;
   height: 60px;
@@ -186,7 +186,7 @@ select {
 
   transition: 0.3s ease-in-out;
 }
-select {
+.form select {
   text-align-last: center;
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -196,11 +196,11 @@ select {
 option {
   padding: 12px 20px;
 }
-input:focus {
+.form input:focus {
   width: 70%;
   outline: none;
 }
-select:focus {
+.form select:focus {
   outline: none;
   border-radius: 10px 10px 0 0;
 }
@@ -223,8 +223,8 @@ select:focus {
   background-color: #66a7a4;
 }
 #totalPlayers {
-  right: 20px;
-  bottom: 20px;
+  right: 10px;
+  top: -10px;
   position: fixed;
   font-weight: bold;
   font-size: larger;

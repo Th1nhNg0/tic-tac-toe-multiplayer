@@ -33,6 +33,11 @@
       <h1 v-if="countDown>0" :key="countDown" id="countDown">{{countDown}}</h1>
     </transition>
 
+    <div class="chatBox">
+      <input type="text" v-model="msg" @keyup.enter="sendMsg()" />
+      <img src="msgbtn.svg" @click="sendMsg()" />
+    </div>
+
     <button
       v-show="(!isStart||winnerImg!='')&&countDown==0"
       v-on:click="$bus.emit('back')"
@@ -59,11 +64,15 @@ export default {
       isStart: false,
       winnerImg: null,
       size: null,
-      countDown: 0
+      countDown: 0,
+      msg: ""
     };
   },
 
   created() {
+    this.socket.on("chat", (id, msg) => {
+      this.$bus.emit("chat", id, msg);
+    });
     this.socket.on("waiting", time => {
       this.countDown = time;
     });
@@ -84,6 +93,11 @@ export default {
     },
     playAgain: function() {
       this.socket.emit("playAgain");
+    },
+    sendMsg: function() {
+      if (this.msg == "") return;
+      this.socket.emit("chat", this.msg);
+      this.msg = "";
     }
   },
 
@@ -95,6 +109,39 @@ export default {
 </script>
 
 <style scoped>
+.chatBox {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  height: 40px;
+}
+.chatBox input {
+  margin: 0 10px;
+  text-align: center;
+  height: 100%;
+  padding: 10px 10px;
+  display: inline-block;
+  border: none;
+  border-radius: 20px;
+  box-sizing: border-box;
+  box-shadow: 0 3px 4px rgba(0, 0, 0, 0.8);
+  outline: none;
+  font-weight: bold;
+  font-size: large;
+}
+
+.chatBox img {
+  display: inline-block;
+  height: 100%;
+  border-radius: 50%;
+  border: 3px solid #f5f5f5;
+  box-shadow: 0 3px 4px rgba(0, 0, 0, 0.8);
+  transition: 0.1s ease-in-out;
+}
+.chatBox img:hover {
+  transform: scale(1.1);
+}
+
 #countDown {
   font-size: 200px;
   margin: 0;
@@ -132,7 +179,7 @@ export default {
   margin-bottom: 20px;
   height: 100px;
 }
-img {
+.overlay img {
   object-fit: cover;
   width: 100%;
   height: 100%;
@@ -149,6 +196,7 @@ img {
 #board {
   background: rgba(0, 0, 0, 0.1);
   margin: auto;
+  margin-bottom: 20px;
   width: 350px;
   height: 350px;
 
