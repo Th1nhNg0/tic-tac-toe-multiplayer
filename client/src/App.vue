@@ -8,7 +8,7 @@
       </div>
     </transition>
 
-    <transition mode="out-in" name="fade">
+    <transition mode="out-in" name="fade" appear>
       <form class="form" v-if="nameScene" v-on:submit.prevent="joinRoom" :style="getStyle">
         <h1>TICTACMUL</h1>
         <input v-model="username" type="text" placeholder="YourName" />
@@ -138,7 +138,6 @@ body {
   min-height: 100%;
   float: left;
   width: 100%;
-  overflow: hidden;
   background: #1a535c;
 
   display: flex;

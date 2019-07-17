@@ -12,7 +12,9 @@
 
     <transition name="msg">
       <div v-if="showChat" class="msg">
-        <p>{{getMess}}</p>
+        <div class="content">
+          <p>{{getMess}}</p>
+        </div>
       </div>
     </transition>
   </div>
@@ -68,11 +70,16 @@ export default {
 
 
 <style scoped>
+.msg .content {
+  overflow: hidden;
+  width: 100%;
+}
 .msg p {
   letter-spacing: 0px;
-  word-wrap: break-word;
 }
 .msg {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
   width: 100px;
   background: #4ecdc4;
   margin: auto;
@@ -92,11 +99,11 @@ export default {
   left: 50%;
   width: 0;
   height: 0;
-  border: 0.719em solid transparent;
+  border: 0.4em solid transparent;
   border-bottom-color: #4ecdc4;
   border-top: 0;
-  margin-left: -0.719em;
-  margin-top: -0.719em;
+  margin-left: -0.4em;
+  margin-top: -0.4em;
 }
 
 .msg-enter-active,

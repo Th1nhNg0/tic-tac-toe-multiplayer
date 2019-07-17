@@ -13,11 +13,6 @@
     </div>
 
     <div id="board" v-show="isStart">
-      <transition name="overlay">
-        <div v-if="winnerImg!=''" class="overlay">
-          <img :src="winnerImg" />
-        </div>
-      </transition>
       <cell
         v-for="cell in cells"
         :key="cell.id"
@@ -27,6 +22,12 @@
         :size="size"
         :id="cell.mark"
       />
+
+      <transition name="overlay">
+        <div v-if="winnerImg!=''" class="overlay">
+          <img :src="winnerImg" />
+        </div>
+      </transition>
     </div>
 
     <transition name="countDown" mode="out-in">
@@ -34,7 +35,9 @@
     </transition>
 
     <div class="chatBox">
-      <input type="text" v-model="msg" @keyup.enter="sendMsg()" />
+      <transition name="msgInput">
+        <input v-show="showMsg" type="text" v-model="msg" @keyup.enter="sendMsg()" />
+      </transition>
       <img src="msgbtn.svg" @click="sendMsg()" />
     </div>
 
@@ -65,7 +68,8 @@ export default {
       winnerImg: null,
       size: null,
       countDown: 0,
-      msg: ""
+      msg: "",
+      showMsg: false
     };
   },
 
@@ -95,6 +99,8 @@ export default {
       this.socket.emit("playAgain");
     },
     sendMsg: function() {
+      if (!this.showMsg) this.showMsg = true;
+      else if (this.showMsg && this.msg == "") this.showMsg = false;
       if (this.msg == "") return;
       this.socket.emit("chat", this.msg);
       this.msg = "";
@@ -119,7 +125,7 @@ export default {
   margin: 0 10px;
   text-align: center;
   height: 100%;
-  padding: 10px 10px;
+  padding: 21px 13px;
   display: inline-block;
   border: none;
   border-radius: 20px;
@@ -137,6 +143,7 @@ export default {
   border: 3px solid #f5f5f5;
   box-shadow: 0 3px 4px rgba(0, 0, 0, 0.8);
   transition: 0.1s ease-in-out;
+  margin: auto;
 }
 .chatBox img:hover {
   transform: scale(1.1);
@@ -157,6 +164,15 @@ export default {
   position: absolute;
   transform: scale(0);
   transform: rotate(90deg);
+}
+.msgInput-enter-active,
+.msgInput-leave-active {
+  transition: all 0.3s ease-in-out;
+}
+.msgInput-enter,
+.msgInput-leave-to {
+  opacity: 0;
+  transform: translateX(-50px);
 }
 
 .countDown-enter-active {
@@ -186,9 +202,8 @@ export default {
   opacity: 0.7;
 }
 .overlay {
-  position: fixed;
-  width: inherit;
-  height: inherit;
+  position: relative;
+  top: -100%;
   background-color: rgba(0, 0, 0, 0.2);
   z-index: 1;
 }
@@ -196,7 +211,7 @@ export default {
 #board {
   background: rgba(0, 0, 0, 0.1);
   margin: auto;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   width: 350px;
   height: 350px;
 
@@ -206,6 +221,7 @@ export default {
   border-style: solid;
   border-width: 1px;
   border-color: black;
+  overflow: hidden;
 }
 
 h3 {
@@ -216,6 +232,9 @@ h3 {
   animation: textAnimate 2s linear infinite;
   -webkit-background-clip: text;
   -webkit-text-fill-color: rgba(255, 255, 255, 0.2);
+}
+h1 {
+  margin: 10px 0;
 }
 @keyframes textAnimate {
   0% {
