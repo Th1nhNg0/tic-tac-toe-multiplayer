@@ -70,7 +70,7 @@ export default {
       }
       this.socket.emit("joinGame", {
         username: this.username || "MeowMeow",
-        img: "https://api.adorable.io/avatars/" + this.username,
+        img: "https://i.pravatar.cc/150?u=" + this.username,
         maxPlayers: this.maxPlayers
       });
       this.nameScene = false;
